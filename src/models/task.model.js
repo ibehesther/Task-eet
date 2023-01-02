@@ -1,13 +1,14 @@
 const { Schema, model } = require("mongoose");
 
 const taskSchema = new Schema({
-    user: {
+    creator: {
         type: Schema.Types.ObjectId,
         required: true,
         ref: "User"
     },
     title: {
         type: String,
+        unique: true,
         required: true
     },
     description: {

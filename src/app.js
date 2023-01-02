@@ -7,7 +7,6 @@ const authRouter = require("./routes/auth.route");
 const userRouter = require("./routes/users.route");
 const taskRouter = require("./routes/tasks.route");
 const { errorHandler } = require("./middlewares/error.middleware");
-const { validateUser } = require("./middlewares/auth.middleware");
 require("dotenv").config();
 
 
@@ -47,7 +46,7 @@ app.use(limiter)
 // Connect routers to express application
 app.use("/api/v1.0", authRouter);
 app.use("/api/v1.0/users", userRouter);
-app.use("/api/v1.0/tasks", validateUser, taskRouter)
+app.use("/api/v1.0/tasks", taskRouter)
 
 // Middleware for handling different types of errors
 app.use(errorHandler)

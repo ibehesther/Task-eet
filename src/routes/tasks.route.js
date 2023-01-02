@@ -1,17 +1,18 @@
 const express = require("express");
 const { createTask, getAllTasks, getTaskById, updateTask, deleteTask } = require("../controllers/tasks.controller");
 const { validateUser } = require("../middlewares/auth.middleware");
+const { validateCreateTask, validateUpdateTask } = require("../validators/task.validator");
 
 const taskRouter = express.Router();
 
-taskRouter.post("/", createTask);
+taskRouter.post("/", [validateUser, validateCreateTask], createTask);
 
-taskRouter.get("/", getAllTasks);
+taskRouter.get("/", validateUser, getAllTasks);
 
-taskRouter.get("/:id", getTaskById);
+taskRouter.get("/:id", validateUser, getTaskById);
 
-taskRouter.patch("/:id", updateTask);
+taskRouter.patch("/:id", [validateUser, validateUpdateTask], updateTask);
 
-taskRouter.delete("/:id", deleteTask)
+taskRouter.delete("/:id", validateUser, deleteTask);
 
 module.exports = taskRouter

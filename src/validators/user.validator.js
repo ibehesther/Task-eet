@@ -51,8 +51,9 @@ exports.validateUpdateUser = async(data, req, res, next) => {
         const { first_name, last_name, email } = req.body;
         try{
              if(!data.type){
+                const user = data
                 const validInput = await updateUserSchema.validateAsync({first_name, last_name, email});
-                next({data, validInput});
+                next({user, validInput});
                 return
              }
              next(data);

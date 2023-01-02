@@ -26,18 +26,23 @@ const userSchema = new Schema({
     }]
 })
 
-// Hash password before saving the database
+// Hash password before saving in the database
 userSchema.pre(
     "save",
     async function(next){
+        if (!this.isModified('password')) {
+            next();
+            return;
+        }
         const hashedPassword = await bcrypt.hash(this.password, 10);
         this.password = hashedPassword;
         next()
     }
 )
 
+// Compare input password with password in database
 userSchema.methods.isValidPassword = async function(input_password){
-    return bcrypt.compare(input_password, this.password);
+    return await bcrypt.compare(input_password, this.password);
 }
 
 exports.User = model("User", userSchema)
