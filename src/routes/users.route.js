@@ -1,7 +1,7 @@
 const express = require("express");
 const { updateUser, deleteUser } = require("../controllers/users.controller");
 const { validateUser } = require("../middlewares/auth.middleware");
-const { validateUpdateUser } = require("../validators/user.validator");
+const { validateUpdateUser } = require("../middlewares/validators/user.validator");
 
 const userRouter = express.Router();
 
