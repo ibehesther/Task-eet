@@ -12,10 +12,10 @@ require("dotenv").config();
 
 const app = express();
 
-const { DATABASE_NAME, DATABASE_PASSWORD, DATABASE_USERNAME } = process.env
+const { DATABASE_CONN_STR } = process.env
 
 // Manage MongoDB connection
-mongoose.connect(`mongodb+srv://${DATABASE_USERNAME}:${DATABASE_PASSWORD}@bareskn-api.o25gix8.mongodb.net/${DATABASE_NAME}?retryWrites=true&w=majority`)
+mongoose.connect(DATABASE_CONN_STR)
 
 mongoose.connection.on("connected", () => {
 	console.log("Connected to MongoDB Successfully");
