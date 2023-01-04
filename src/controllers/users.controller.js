@@ -6,6 +6,8 @@ exports.updateUser = async(data, req, res, next) => {
     try{
         // Data contains a type field only when returning an error
         if(!type){
+
+            // filter out the field(s) that are not undefined
             let filtered_input = {}
             let filtered_fields = Object.keys(validInput).filter((field) => validInput[field] !== undefined)
             filtered_fields.forEach((field) => filtered_input[field] = validInput[field]);
