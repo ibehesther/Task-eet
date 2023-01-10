@@ -1,3 +1,4 @@
+const APIFeatures = require("../../utils/apiFeatures");
 const { Task } = require("../models/task.model");
 const { User } = require("../models/user.model");
 
@@ -6,14 +7,15 @@ exports.createTask = async( data, req, res, next ) => {
     try{
         // Data contains a type field only when returning an error
         if(!type){
-            let creator = await User.findById(user._id)
-            const task = await Task.create({creator: user._id,...validInput});
-            creator.tasks.push(task)
+            let creator = await User.findById(user._id);
+            let task = await Task.create({creator: creator._id, ...validInput});
+            creator.tasks.push(task);
             creator.save();
             res.status(201).json({task});
+            return
         }
         else{
-            next(data);
+            return next(data);
         }
     }catch(err){
         err.type = "bad request"
@@ -23,34 +25,14 @@ exports.createTask = async( data, req, res, next ) => {
 }
 
 exports.getAllTasks = async(data, req, res, next) => {
-    let { limit=10, page=1, status=1, title, description, tags, sort="desc" } = req.query;
-    limit = parseInt(limit);
-    page = parseInt(page);
-    startPage = (page - 1) * limit;
-    endPage = startPage + limit;
-    const { type, _id} = data;
-
-    const sort_format = (sort === "desc") ? -1 : 1;
-
-    // check if user specifies title filter term
-    // if yes, return an object useful for a case insensitive database query
-    const search_title = title && {title: {$regex: title, $options: 'i'}};
-
-    // check if user specifies description filter term
-    // if yes, return an object useful for a case insensitive database query
-    const search_desc = description && {description: {$regex: description, $options: 'i'}};
-
-    // check if user specifies tag filter term
-    // if yes, return an object with its value
-    const search_tags = tags && {tags}
+    const { type } = data;
     try{
         if(!type){
-            const tasks = await Task.find({creator: _id, status, ...search_title, ...search_desc, ...search_tags})
-                                .sort({createdAt: sort_format})
-                                .populate()
-                                .all()
-                                .limit(limit).skip((page-1) * limit);
-            res.json({tasks});
+            const tasks = new APIFeatures(Task.find({}), req.query)
+                            .filter()
+                            .sort()
+                            .paginate();
+            res.json(await tasks.query);
             return
         }else{
             next(data);

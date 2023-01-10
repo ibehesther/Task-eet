@@ -57,3 +57,15 @@ exports.signinUser = async(req, res, next) => {
         next(err)
     }
 }
+
+// Change password 
+// When the previous password has been forgotten
+exports.changePassword = async (req, res, next) => {
+
+}
+
+// Change password
+// When the previous password has not been forgotten
+exports.resetPassword = async(req, res, next) => {
+
+}

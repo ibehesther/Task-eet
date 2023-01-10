@@ -6,7 +6,6 @@ exports.updateUser = async(data, req, res, next) => {
     try{
         // Data contains a type field only when returning an error
         if(!type){
-
             // filter out the field(s) that are not undefined
             let filtered_input = {}
             let filtered_fields = Object.keys(validInput).filter((field) => validInput[field] !== undefined)
@@ -31,8 +30,10 @@ exports.deleteUser = async(data, req, res, next) => {
         // Data contains a type field only when returning an error
         if(!data.type){
             const deletedUser = await User.findByIdAndDelete(data._id);
+
             if(deletedUser){
-                res.json({message: "User deleted successfully"})
+                res.clearCookie("access_token")
+                .json({message: "User deleted successfully"});
                 return;
             }
         }

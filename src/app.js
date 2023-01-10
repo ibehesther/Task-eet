@@ -15,7 +15,10 @@ const app = express();
 const { DATABASE_CONN_STR } = process.env
 
 // Manage MongoDB connection
-mongoose.connect(DATABASE_CONN_STR)
+mongoose.connect(DATABASE_CONN_STR, {
+	useNewUrlParser: true,
+	autoIndex: true, //make this also true
+})
 
 mongoose.connection.on("connected", () => {
 	console.log("Connected to MongoDB Successfully");
