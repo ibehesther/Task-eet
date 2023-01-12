@@ -59,13 +59,48 @@ exports.signinUser = async(req, res, next) => {
 }
 
 // Change password 
-// When the previous password has been forgotten
-exports.changePassword = async (req, res, next) => {
+// When the previous password has not been forgotten
+exports.changePassword = async (data, req, res, next) => {
+    try{
+        if(data.type){
+            next(data);
+            return
+        }
+        const { user, validInput } = data;
+        const { password, new_password } = validInput;
 
+        const validPassword = await user.isValidPassword(password);
+
+        if(!validPassword){
+            let error = new Error();
+            error.type = "unauthenticated";
+            next(error);
+            return;
+        }
+        user.password = new_password;
+        await user.save();
+        res.json({message: "Password has been updated"})
+    } catch(err) {
+        next(err);
+    }
 }
 
 // Change password
-// When the previous password has not been forgotten
+// When the previous password has been forgotten
 exports.resetPassword = async(req, res, next) => {
 
+}
+
+// Logout user
+exports.logout = async (data, req, res, next) => {
+    try{
+        if(data.type){
+            return next(data);
+        }
+        res.clearCookie("access_token")
+            .json({message: "Logout successful"});
+        return;
+    }catch(err){
+        next(err);
+    }
 }

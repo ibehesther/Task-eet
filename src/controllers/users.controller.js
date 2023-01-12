@@ -1,3 +1,4 @@
+const { Task } = require("../models/task.model");
 const { User } = require("../models/user.model");
 
 
@@ -29,13 +30,16 @@ exports.deleteUser = async(data, req, res, next) => {
     try{
         // Data contains a type field only when returning an error
         if(!data.type){
-            const deletedUser = await User.findByIdAndDelete(data._id);
+            let user = await User.findById(data._id);
 
-            if(deletedUser){
-                res.clearCookie("access_token")
+            // delete all the tasks created by the user
+            user.tasks.forEach(async(id) => await Task.findByIdAndDelete(id));
+            await user.delete();
+
+            // remove the cookie from cookie storage
+            res.clearCookie("access_token")
                 .json({message: "User deleted successfully"});
-                return;
-            }
+            return;
         }
         else{
             next(data);

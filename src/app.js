@@ -7,6 +7,7 @@ const authRouter = require("./routes/auth.route");
 const userRouter = require("./routes/users.route");
 const taskRouter = require("./routes/tasks.route");
 const { errorHandler } = require("./middlewares/error.middleware");
+const { default: helmet } = require("helmet");
 require("dotenv").config();
 
 
@@ -32,7 +33,8 @@ mongoose.connection.on("error", (err) => {
 
 app.use(cors({origin: "*"}))
 app.use(express.json());
-app.use(cookies())
+app.use(cookies());
+app.use(helmet());
 
 const PORT = process.env.PORT || 8000;
 

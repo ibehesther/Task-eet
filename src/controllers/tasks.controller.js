@@ -99,13 +99,21 @@ exports.deleteTask = async(data, req, res, next) => {
     const task_id = req.params.id;
 
     try{
-        const deletedTask = await Task.findByIdAndDelete(task_id);
-        console.log(deletedTask)
-        if(deletedTask) {
-            res.json({message: "Task deleted successfully"});
+        if(data.type){
+            next(data);
             return
         }
-        throw new Error();
+        const task = await Task.findById(task_id);
+        let creator = await User.findById(task.creator);
+        let creator_tasks = creator.tasks;
+        creator_tasks.forEach(async(id, index) => id.equals(task._id) && delete creator_tasks[index])
+        console.log(creator_tasks)
+        creator.tasks = creator_tasks
+        await creator.save();
+        await task.delete();
+
+        res.json({message: "Task deleted successfully"});
+        return
     }catch(err){
         err.type="not found";
         next(err);

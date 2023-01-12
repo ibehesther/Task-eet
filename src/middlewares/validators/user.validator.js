@@ -34,6 +34,17 @@ const updateUserSchema = Joi.object({
         .email({minDomainSegments: 2, tlds: { allow: ["com", "net"]}})
     }) 
 
+const changePasswordSchema = Joi.object({
+    password: Joi.string()
+        .required(),
+    new_password: Joi.string()
+        .disallow(Joi.ref('password'))
+        .required()
+        .messages({
+            'any.invalid': `new_password cannot have the same value as password`
+          })
+}) 
+    
 
 
 exports.validateCreateUser = async(req, res, next) => {
@@ -61,4 +72,20 @@ exports.validateUpdateUser = async(data, req, res, next) => {
              err.type = "bad request"
              next(err);
         }
+}
+
+exports.validateChangePassword = async(data, req, res, next) => {
+    const { type } = data;
+    const { password, new_password } = req.body;
+    try{
+        if(type){
+            next(data);
+            return;
+        }
+        const validInput = await changePasswordSchema.validateAsync({password, new_password});
+        next({user: data, validInput});
+    }catch(err){
+        err.type = "bad request"
+        next(err);
+    }
 }
