@@ -5,7 +5,6 @@ const { validateUpdateUser } = require("../middlewares/validators/user.validator
 
 const userRouter = express.Router();
 
-userRouter.get("/", (req, res) => res.send("successful"));
 
 userRouter.patch("/", [ authenticateUser, validateUpdateUser], updateUser);
 
