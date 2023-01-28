@@ -1,7 +1,8 @@
-const { model, Schema } = require("mongoose");
-const bcrypt = require("bcrypt");
+import { model, Schema } from "mongoose";
+import bcrypt from "bcrypt";
+import { IUser } from "../types/user";
 
-const userSchema = new Schema({
+const userSchema = new Schema<IUser>({
     first_name: {
         type: String,
         required: true
@@ -41,8 +42,8 @@ userSchema.pre(
 )
 
 // Compare input password with password in database
-userSchema.methods.isValidPassword = async function(input_password){
+userSchema.methods.isValidPassword = async function(input_password: string): Promise<Boolean>{
     return await bcrypt.compare(input_password, this.password);
 }
 
-exports.User = model("User", userSchema)
+export const User = model<IUser>("User", userSchema)

@@ -107,7 +107,7 @@ exports.deleteTask = async(data, req, res, next) => {
         let creator = await User.findById(task.creator);
         let creator_tasks = creator.tasks;
         creator_tasks.forEach(async(id, index) => id.equals(task._id) && delete creator_tasks[index])
-        console.log(creator_tasks)
+        a
         creator.tasks = creator_tasks
         await creator.save();
         await task.delete();

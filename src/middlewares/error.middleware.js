@@ -1,4 +1,4 @@
-const errorHandler = (error, req, res, next) => {
+export function errorHandler(error, req, res, next) {
   const message = error.e_message || error.details && error.details[0].message
   switch(error.type){
       case "bad request":
@@ -39,5 +39,3 @@ const errorHandler = (error, req, res, next) => {
     }
     next();
 }
-
-module.exports = { errorHandler };

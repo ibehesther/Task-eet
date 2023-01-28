@@ -1,0 +1,13 @@
+"use strict";
+const express = require("express");
+const { createTask, getAllTasks, getTaskById, updateTask, deleteTask } = require("../controllers/tasks.controller");
+const { authenticateUser, authorizeUser } = require("../middlewares/auth.middleware");
+const { validateCreateTask, validateUpdateTask } = require("../middlewares/validators/task.validator");
+const taskRouter = express.Router();
+taskRouter.post("/", [authenticateUser, validateCreateTask], createTask);
+taskRouter.get("/", authenticateUser, getAllTasks);
+taskRouter.get("/:id", authenticateUser, getTaskById);
+taskRouter.patch("/:id", [authenticateUser, authorizeUser, validateUpdateTask], updateTask);
+taskRouter.delete("/:id", [authenticateUser, authorizeUser], deleteTask);
+module.exports = taskRouter;
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoidGFza3Mucm91dGUuanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi9zcmMvcm91dGVzL3Rhc2tzLnJvdXRlLmpzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7QUFBQSxNQUFNLE9BQU8sR0FBRyxPQUFPLENBQUMsU0FBUyxDQUFDLENBQUM7QUFDbkMsTUFBTSxFQUFFLFVBQVUsRUFBRSxXQUFXLEVBQUUsV0FBVyxFQUFFLFVBQVUsRUFBRSxVQUFVLEVBQUUsR0FBRyxPQUFPLENBQUMsaUNBQWlDLENBQUMsQ0FBQztBQUNwSCxNQUFNLEVBQUUsZ0JBQWdCLEVBQUUsYUFBYSxFQUFFLEdBQUcsT0FBTyxDQUFDLGdDQUFnQyxDQUFDLENBQUM7QUFDdEYsTUFBTSxFQUFFLGtCQUFrQixFQUFFLGtCQUFrQixFQUFFLEdBQUcsT0FBTyxDQUFDLDBDQUEwQyxDQUFDLENBQUM7QUFFdkcsTUFBTSxVQUFVLEdBQUcsT0FBTyxDQUFDLE1BQU0sRUFBRSxDQUFDO0FBRXBDLFVBQVUsQ0FBQyxJQUFJLENBQUMsR0FBRyxFQUFFLENBQUMsZ0JBQWdCLEVBQUUsa0JBQWtCLENBQUMsRUFBRSxVQUFVLENBQUMsQ0FBQztBQUV6RSxVQUFVLENBQUMsR0FBRyxDQUFDLEdBQUcsRUFBRSxnQkFBZ0IsRUFBRSxXQUFXLENBQUMsQ0FBQztBQUVuRCxVQUFVLENBQUMsR0FBRyxDQUFDLE1BQU0sRUFBRSxnQkFBZ0IsRUFBRSxXQUFXLENBQUMsQ0FBQztBQUV0RCxVQUFVLENBQUMsS0FBSyxDQUFDLE1BQU0sRUFBRSxDQUFDLGdCQUFnQixFQUFFLGFBQWEsRUFBRSxrQkFBa0IsQ0FBQyxFQUFFLFVBQVUsQ0FBQyxDQUFDO0FBRTVGLFVBQVUsQ0FBQyxNQUFNLENBQUMsTUFBTSxFQUFFLENBQUMsZ0JBQWdCLEVBQUUsYUFBYSxDQUFDLEVBQUUsVUFBVSxDQUFDLENBQUM7QUFFekUsTUFBTSxDQUFDLE9BQU8sR0FBRyxVQUFVLENBQUEifQ==

@@ -1,4 +1,7 @@
-const Joi = require("joi");
+import Joi from "joi";
+import { Request, Response, NextFunction } from 'express';
+import { IUser } from "../../types/user";
+import { Error } from "../../types/middleware";
 
 const userSchema = Joi.object({
     first_name: Joi.string()
@@ -47,44 +50,43 @@ const changePasswordSchema = Joi.object({
     
 
 
-exports.validateCreateUser = async(req, res, next) => {
+export const validateCreateUser = async(req: Request, res: Response, next: NextFunction) => {
     const { first_name, last_name, email, password, tasks } = req.body;
     try{
         const validInput = await userSchema.validateAsync({first_name, last_name, email, password, tasks});
         next(validInput);
-    }catch(err){
+    }catch(err: any){
         err.type = "bad request"
         next(err);
     }
 }
 
-exports.validateUpdateUser = async(data, req, res, next) => {
+export const validateUpdateUser = async(data: IUser | Error, req: Request, res: Response, next: NextFunction) => {
         const { first_name, last_name, email } = req.body;
         try{
-             if(!data.type){
-                const user = data
-                const validInput = await updateUserSchema.validateAsync({first_name, last_name, email});
-                next({user, validInput});
-                return
+             if(typeof data === "object" && data instanceof Error){
+                next(data);
+                return;
              }
-             next(data);
-        }catch(err){
+             const user = data
+             const validInput = await updateUserSchema.validateAsync({first_name, last_name, email});
+             next({user, validInput});
+        }catch (err: any){
              err.type = "bad request"
              next(err);
         }
 }
 
-exports.validateChangePassword = async(data, req, res, next) => {
-    const { type } = data;
+export const validateChangePassword = async(data: IUser | Error, req: Request, res: Response, next: NextFunction) => {
     const { password, new_password } = req.body;
     try{
-        if(type){
+        if(typeof data === "object" && data instanceof Error ){
             next(data);
             return;
         }
         const validInput = await changePasswordSchema.validateAsync({password, new_password});
         next({user: data, validInput});
-    }catch(err){
+    }catch(err: any){
         err.type = "bad request"
         next(err);
     }

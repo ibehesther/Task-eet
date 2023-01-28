@@ -1,13 +1,13 @@
 const jwt = require("jsonwebtoken");
 const { Task } = require("../models/task.model");
-const { User } = require("../models/user.model");
+const User  = require("../models/user.model");
 require("dotenv").config()
 
 const { JWT_SECRET } = process.env
 
 // Ensure the user is authenticated
 // i.e registered 
-exports.authenticateUser = async(req, res, next) => {
+export const authenticateUser = async(req, res, next) => {
     const cookies= req.cookies;
     // check if the request has cookies
     if(!cookies){
@@ -31,7 +31,7 @@ exports.authenticateUser = async(req, res, next) => {
     }
 }
 
-exports.authorizeUser = async(data,  req, res, next) => {
+export const authorizeUser = async(data,  req, res, next) => {
     const task_id = req.params.id;
    
     try{
