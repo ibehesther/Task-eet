@@ -1,7 +1,7 @@
 import Joi from "joi";
 import { Request, Response, NextFunction } from 'express';
 import { IUser } from "../../types/user";
-import { Error } from "../../types/middleware";
+import { IError } from "../../types/middleware";
 
 const userSchema = Joi.object({
     first_name: Joi.string()
@@ -61,10 +61,10 @@ export const validateCreateUser = async(req: Request, res: Response, next: NextF
     }
 }
 
-export const validateUpdateUser = async(data: IUser | Error, req: Request, res: Response, next: NextFunction) => {
+export const validateUpdateUser = async(data: IUser | IError, req: Request, res: Response, next: NextFunction) => {
         const { first_name, last_name, email } = req.body;
         try{
-             if(typeof data === "object" && data instanceof Error){
+             if("type" in data){
                 next(data);
                 return;
              }
@@ -77,10 +77,10 @@ export const validateUpdateUser = async(data: IUser | Error, req: Request, res: 
         }
 }
 
-export const validateChangePassword = async(data: IUser | Error, req: Request, res: Response, next: NextFunction) => {
+export const validateChangePassword = async(data: IUser | IError, req: Request, res: Response, next: NextFunction) => {
     const { password, new_password } = req.body;
     try{
-        if(typeof data === "object" && data instanceof Error ){
+        if("type" in data){
             next(data);
             return;
         }

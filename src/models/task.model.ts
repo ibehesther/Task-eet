@@ -1,4 +1,4 @@
-const { Schema, model } = require("mongoose");
+import { Schema, model } from "mongoose";
 
 const taskSchema = new Schema({
     creator: {
@@ -25,4 +25,4 @@ const taskSchema = new Schema({
     }
 }, {timestamps: true})
 
-exports.Task = model("Task", taskSchema)
+export const Task = model("Task", taskSchema)

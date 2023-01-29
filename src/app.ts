@@ -55,8 +55,8 @@ app.use(limiter)
 
 // Connect routers to express application
 app.use("/api/v1.0", authRouter);
-// app.use("/api/v1.0/users", userRouter);
-// app.use("/api/v1.0/tasks", taskRouter)
+app.use("/api/v1.0/users", userRouter);
+app.use("/api/v1.0/tasks", taskRouter)
 
 app.get("/api/v1.0", (req: Request, res: Response) => {
     res.send("Welcome to Task-eet API v1.0")

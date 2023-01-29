@@ -1,3 +1,7 @@
+import { NextFunction, Request, Response } from "express";
+import { IError } from "../../types/middleware";
+import { IUser } from "../../types/user";
+
 const Joi = require("joi");
 
 const taskSchema = Joi.object({
@@ -34,35 +38,29 @@ const updateTaskSchema = Joi.object({
 
 
 
-exports.validateCreateTask = async(data, req, res, next) => {
+export const validateCreateTask = async(data: IUser | IError, req: Request, res: Response, next: NextFunction) => {
     const { title, description, tags } = req.body;
     try{
-        if(!data.type){
-            const user = data
-            const validInput = await taskSchema.validateAsync({ title, description, tags });
-            next({user, validInput});
-            return
-        }
-        next(data);
-        return
-    }catch(err){
+        if("type" in data) return next(data);
+
+        const user = data
+        const validInput = await taskSchema.validateAsync({ title, description, tags });
+        next({user, validInput});
+    }catch(err: any){
         err.type = "bad request"
         next(err);
     }
 }
 
-exports.validateUpdateTask = async(data, req, res, next) => {
+export const validateUpdateTask = async(data: IUser | IError, req: Request, res: Response, next: NextFunction) => {
         const { title, description, status, tags } = req.body;
         try{
-             if(!data.type){
-                const user = data
-                const validInput = await updateTaskSchema.validateAsync({title, description, status, tags});
-                next({user, validInput});
-                return
-             }
-            next(data);
-            return
-        }catch(err){
+            if("type" in data) return next(data);
+
+            const user = data
+            const validInput = await updateTaskSchema.validateAsync({title, description, status, tags});
+            next({user, validInput});
+        }catch(err: any){
              err.type = "bad request"
              next(err);
         }

@@ -1,13 +1,14 @@
 "use strict";
-const express = require("express");
-const { signupUser, signinUser, changePassword, logout } = require("../controllers/auth.controller");
-const { authenticateUser } = require("../middlewares/auth.middleware");
-const { validateCreateUser, validateChangePassword } = require("../middlewares/validators/user.validator");
-const authRouter = express.Router();
-authRouter.post("/signup", validateCreateUser, signupUser);
-authRouter.post("/signin", signinUser);
-authRouter.post("/change_password", [authenticateUser, validateChangePassword], changePassword);
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const auth_controller_1 = require("../controllers/auth.controller");
+const auth_middleware_1 = require("../middlewares/auth.middleware");
+const user_validator_1 = require("../middlewares/validators/user.validator");
+const authRouter = (0, express_1.Router)();
+authRouter.post("/signup", user_validator_1.validateCreateUser, auth_controller_1.signupUser);
+authRouter.post("/signin", auth_controller_1.signinUser);
+authRouter.post("/change_password", [auth_middleware_1.authenticateUser, user_validator_1.validateChangePassword], auth_controller_1.changePassword);
 authRouter.post("/reset_password");
-authRouter.post("/logout", authenticateUser, logout);
-module.exports = authRouter;
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiYXV0aC5yb3V0ZS5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uL3NyYy9yb3V0ZXMvYXV0aC5yb3V0ZS5qcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiO0FBQUEsTUFBTSxPQUFPLEdBQUcsT0FBTyxDQUFDLFNBQVMsQ0FBQyxDQUFDO0FBQ25DLE1BQU0sRUFBRSxVQUFVLEVBQUUsVUFBVSxFQUFFLGNBQWMsRUFBRSxNQUFNLEVBQUUsR0FBRyxPQUFPLENBQUMsZ0NBQWdDLENBQUMsQ0FBQztBQUNyRyxNQUFNLEVBQUUsZ0JBQWdCLEVBQUUsR0FBRyxPQUFPLENBQUMsZ0NBQWdDLENBQUMsQ0FBQztBQUN2RSxNQUFNLEVBQUUsa0JBQWtCLEVBQUUsc0JBQXNCLEVBQUUsR0FBRyxPQUFPLENBQUMsMENBQTBDLENBQUMsQ0FBQztBQUUzRyxNQUFNLFVBQVUsR0FBRyxPQUFPLENBQUMsTUFBTSxFQUFFLENBQUM7QUFFcEMsVUFBVSxDQUFDLElBQUksQ0FBQyxTQUFTLEVBQUUsa0JBQWtCLEVBQUUsVUFBVSxDQUFDLENBQUM7QUFFM0QsVUFBVSxDQUFDLElBQUksQ0FBQyxTQUFTLEVBQUUsVUFBVSxDQUFDLENBQUM7QUFFdkMsVUFBVSxDQUFDLElBQUksQ0FBQyxrQkFBa0IsRUFBRSxDQUFDLGdCQUFnQixFQUFFLHNCQUFzQixDQUFDLEVBQUUsY0FBYyxDQUFDLENBQUM7QUFFaEcsVUFBVSxDQUFDLElBQUksQ0FBQyxpQkFBaUIsQ0FBQyxDQUFDO0FBRW5DLFVBQVUsQ0FBQyxJQUFJLENBQUMsU0FBUyxFQUFFLGdCQUFnQixFQUFFLE1BQU0sQ0FBQyxDQUFDO0FBR3JELE1BQU0sQ0FBQyxPQUFPLEdBQUcsVUFBVSxDQUFDIn0=
+authRouter.post("/logout", auth_middleware_1.authenticateUser, auth_controller_1.logout);
+exports.default = authRouter;
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiYXV0aC5yb3V0ZS5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uL3NyYy9yb3V0ZXMvYXV0aC5yb3V0ZS50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOztBQUFBLHFDQUErQjtBQUMvQixvRUFBZ0c7QUFDaEcsb0VBQWtFO0FBQ2xFLDZFQUFzRztBQUV0RyxNQUFNLFVBQVUsR0FBRyxJQUFBLGdCQUFNLEdBQUUsQ0FBQztBQUU1QixVQUFVLENBQUMsSUFBSSxDQUFDLFNBQVMsRUFBRSxtQ0FBa0IsRUFBRSw0QkFBVSxDQUFDLENBQUM7QUFFM0QsVUFBVSxDQUFDLElBQUksQ0FBQyxTQUFTLEVBQUUsNEJBQVUsQ0FBQyxDQUFDO0FBRXZDLFVBQVUsQ0FBQyxJQUFJLENBQUMsa0JBQWtCLEVBQUUsQ0FBQyxrQ0FBZ0IsRUFBRSx1Q0FBc0IsQ0FBQyxFQUFFLGdDQUFjLENBQUMsQ0FBQztBQUVoRyxVQUFVLENBQUMsSUFBSSxDQUFDLGlCQUFpQixDQUFDLENBQUM7QUFFbkMsVUFBVSxDQUFDLElBQUksQ0FBQyxTQUFTLEVBQUUsa0NBQWdCLEVBQUUsd0JBQU0sQ0FBQyxDQUFDO0FBR3JELGtCQUFlLFVBQVUsQ0FBQyJ9

@@ -8,62 +8,62 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-const APIFeatures = require("../../utils/apiFeatures");
-const { Task } = require("../models/task.model");
-const { User } = require("../models/user.model");
-exports.createTask = (data, req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { user, validInput, type } = data;
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.deleteTask = exports.updateTask = exports.getTaskById = exports.getAllTasks = exports.createTask = void 0;
+const apiFeatures_1 = __importDefault(require("../utils/apiFeatures"));
+const task_model_1 = require("../models/task.model");
+const user_model_1 = require("../models/user.model");
+const createTask = (data, req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // Data contains a type field only when returning an error
-        if (!type) {
-            let creator = yield User.findById(user._id);
-            let task = yield Task.create(Object.assign({ creator: creator._id }, validInput));
-            creator.tasks.push(task);
-            creator.save();
-            res.status(201).json({ task });
-            return;
-        }
-        else {
+        if ("type" in data)
             return next(data);
-        }
+        let { user, validInput } = data;
+        let creator = yield user_model_1.User.findById(user._id);
+        if (!creator)
+            throw Error();
+        let task = yield task_model_1.Task.create(Object.assign({ creator: creator._id }, validInput));
+        if (!task)
+            throw Error();
+        creator.tasks.push(task._id);
+        creator.save();
+        res.status(201).json({ task });
     }
     catch (err) {
         err.type = "bad request";
         next(err);
     }
 });
-exports.getAllTasks = (data, req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { type } = data;
+exports.createTask = createTask;
+const getAllTasks = (data, req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        if (!type) {
-            const tasks = new APIFeatures(Task.find({}), req.query)
-                .filter()
-                .sort()
-                .paginate();
-            res.json(yield tasks.query);
-            return;
-        }
-        else {
-            next(data);
-        }
+        if ("type" in data)
+            return next(data);
+        const tasks = new apiFeatures_1.default(task_model_1.Task.find({}), req.query)
+            .filter()
+            .sort()
+            .paginate();
+        res.json(yield tasks.query);
     }
     catch (err) {
         next(err);
     }
 });
-exports.getTaskById = (data, req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { _id, type } = data;
+exports.getAllTasks = getAllTasks;
+const getTaskById = (data, req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const task_id = req.params.id;
     try {
-        if (type) {
-            next(data);
-            return;
-        }
-        const task = yield Task.findById(task_id);
+        if ("type" in data)
+            return next(data);
+        const task = yield task_model_1.Task.findById(task_id);
+        if (!task)
+            throw Error();
         // check if the task was created by the user requesting it
-        if (!task.creator.equals(_id)) {
-            let err = new Error();
-            err.type = "unauthorized";
+        if (!task.creator.equals(data._id)) {
+            let err = { type: "unauthorized" };
             next(err);
             return;
         }
@@ -71,45 +71,43 @@ exports.getTaskById = (data, req, res, next) => __awaiter(void 0, void 0, void 0
         return;
     }
     catch (err) {
+        err.type = "not found";
         next(err);
     }
 });
-exports.updateTask = (data, req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+exports.getTaskById = getTaskById;
+const updateTask = (data, req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const task_id = req.params.id;
-    const { user, validInput, type } = data;
     try {
         // Data contains a type field only when returning an error
-        if (!type) {
-            // filter out the field(s) that are not undefined
-            let filtered_input = {};
-            let filtered_fields = Object.keys(validInput).filter((field) => validInput[field] !== undefined);
-            filtered_fields.forEach((field) => filtered_input[field] = validInput[field]);
-            const updatedTask = yield Task.findByIdAndUpdate({ _id: task_id }, { $set: filtered_input });
-            if (updatedTask) {
-                res.json({ message: "Task updated successfully" });
-                return;
-            }
-        }
-        else {
-            next(data);
-        }
+        if ("type" in data)
+            return next(data);
+        const { validInput } = data;
+        const filtered_input = Object.fromEntries(Object.entries(validInput).filter(([key, value]) => value !== undefined));
+        const updatedTask = yield task_model_1.Task.findByIdAndUpdate({ _id: task_id }, { $set: filtered_input });
+        if (!updatedTask)
+            throw Error();
+        res.json({ message: "Task updated successfully" });
     }
     catch (err) {
+        err.type = "not found";
         next(err);
     }
 });
-exports.deleteTask = (data, req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+exports.updateTask = updateTask;
+const deleteTask = (data, req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const task_id = req.params.id;
     try {
-        if (data.type) {
-            next(data);
-            return;
-        }
-        const task = yield Task.findById(task_id);
-        let creator = yield User.findById(task.creator);
+        if ("type" in data)
+            return next(data);
+        const task = yield task_model_1.Task.findById(task_id);
+        if (!task)
+            throw Error();
+        let creator = yield user_model_1.User.findById(task.creator);
+        if (!creator)
+            throw Error();
         let creator_tasks = creator.tasks;
         creator_tasks.forEach((id, index) => __awaiter(void 0, void 0, void 0, function* () { return id.equals(task._id) && delete creator_tasks[index]; }));
-        a;
         creator.tasks = creator_tasks;
         yield creator.save();
         yield task.delete();
@@ -121,4 +119,5 @@ exports.deleteTask = (data, req, res, next) => __awaiter(void 0, void 0, void 0,
         next(err);
     }
 });
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoidGFza3MuY29udHJvbGxlci5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uL3NyYy9jb250cm9sbGVycy90YXNrcy5jb250cm9sbGVyLmpzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7QUFBQSxNQUFNLFdBQVcsR0FBRyxPQUFPLENBQUMseUJBQXlCLENBQUMsQ0FBQztBQUN2RCxNQUFNLEVBQUUsSUFBSSxFQUFFLEdBQUcsT0FBTyxDQUFDLHNCQUFzQixDQUFDLENBQUM7QUFDakQsTUFBTSxFQUFFLElBQUksRUFBRSxHQUFHLE9BQU8sQ0FBQyxzQkFBc0IsQ0FBQyxDQUFDO0FBRWpELE9BQU8sQ0FBQyxVQUFVLEdBQUcsQ0FBTyxJQUFJLEVBQUUsR0FBRyxFQUFFLEdBQUcsRUFBRSxJQUFJLEVBQUcsRUFBRTtJQUNqRCxNQUFNLEVBQUUsSUFBSSxFQUFFLFVBQVUsRUFBRSxJQUFJLEVBQUMsR0FBRyxJQUFJLENBQUM7SUFDdkMsSUFBRztRQUNDLDBEQUEwRDtRQUMxRCxJQUFHLENBQUMsSUFBSSxFQUFDO1lBQ0wsSUFBSSxPQUFPLEdBQUcsTUFBTSxJQUFJLENBQUMsUUFBUSxDQUFDLElBQUksQ0FBQyxHQUFHLENBQUMsQ0FBQztZQUM1QyxJQUFJLElBQUksR0FBRyxNQUFNLElBQUksQ0FBQyxNQUFNLGlCQUFFLE9BQU8sRUFBRSxPQUFPLENBQUMsR0FBRyxJQUFLLFVBQVUsRUFBRSxDQUFDO1lBQ3BFLE9BQU8sQ0FBQyxLQUFLLENBQUMsSUFBSSxDQUFDLElBQUksQ0FBQyxDQUFDO1lBQ3pCLE9BQU8sQ0FBQyxJQUFJLEVBQUUsQ0FBQztZQUNmLEdBQUcsQ0FBQyxNQUFNLENBQUMsR0FBRyxDQUFDLENBQUMsSUFBSSxDQUFDLEVBQUMsSUFBSSxFQUFDLENBQUMsQ0FBQztZQUM3QixPQUFNO1NBQ1Q7YUFDRztZQUNBLE9BQU8sSUFBSSxDQUFDLElBQUksQ0FBQyxDQUFDO1NBQ3JCO0tBQ0o7SUFBQSxPQUFNLEdBQUcsRUFBQztRQUNQLEdBQUcsQ0FBQyxJQUFJLEdBQUcsYUFBYSxDQUFBO1FBQ3hCLElBQUksQ0FBQyxHQUFHLENBQUMsQ0FBQztLQUNiO0FBRUwsQ0FBQyxDQUFBLENBQUE7QUFFRCxPQUFPLENBQUMsV0FBVyxHQUFHLENBQU0sSUFBSSxFQUFFLEdBQUcsRUFBRSxHQUFHLEVBQUUsSUFBSSxFQUFFLEVBQUU7SUFDaEQsTUFBTSxFQUFFLElBQUksRUFBRSxHQUFHLElBQUksQ0FBQztJQUN0QixJQUFHO1FBQ0MsSUFBRyxDQUFDLElBQUksRUFBQztZQUNMLE1BQU0sS0FBSyxHQUFHLElBQUksV0FBVyxDQUFDLElBQUksQ0FBQyxJQUFJLENBQUMsRUFBRSxDQUFDLEVBQUUsR0FBRyxDQUFDLEtBQUssQ0FBQztpQkFDdEMsTUFBTSxFQUFFO2lCQUNSLElBQUksRUFBRTtpQkFDTixRQUFRLEVBQUUsQ0FBQztZQUM1QixHQUFHLENBQUMsSUFBSSxDQUFDLE1BQU0sS0FBSyxDQUFDLEtBQUssQ0FBQyxDQUFDO1lBQzVCLE9BQU07U0FDVDthQUFJO1lBQ0QsSUFBSSxDQUFDLElBQUksQ0FBQyxDQUFDO1NBQ2Q7S0FDSjtJQUFBLE9BQU0sR0FBRyxFQUFFO1FBQ1IsSUFBSSxDQUFDLEdBQUcsQ0FBQyxDQUFBO0tBQ1o7QUFFTCxDQUFDLENBQUEsQ0FBQTtBQUVELE9BQU8sQ0FBQyxXQUFXLEdBQUcsQ0FBTSxJQUFJLEVBQUUsR0FBRyxFQUFFLEdBQUcsRUFBRSxJQUFJLEVBQUUsRUFBRTtJQUNoRCxNQUFNLEVBQUUsR0FBRyxFQUFFLElBQUksRUFBRSxHQUFHLElBQUksQ0FBQztJQUMzQixNQUFNLE9BQU8sR0FBRyxHQUFHLENBQUMsTUFBTSxDQUFDLEVBQUUsQ0FBQztJQUM5QixJQUFHO1FBQ0MsSUFBRyxJQUFJLEVBQUM7WUFDSixJQUFJLENBQUMsSUFBSSxDQUFDLENBQUM7WUFDWCxPQUFPO1NBQ1Y7UUFDRCxNQUFNLElBQUksR0FBRyxNQUFNLElBQUksQ0FBQyxRQUFRLENBQUMsT0FBTyxDQUFDLENBQUM7UUFFMUMsMERBQTBEO1FBQzFELElBQUcsQ0FBQyxJQUFJLENBQUMsT0FBTyxDQUFDLE1BQU0sQ0FBQyxHQUFHLENBQUMsRUFBQztZQUN6QixJQUFJLEdBQUcsR0FBRyxJQUFJLEtBQUssRUFBRSxDQUFDO1lBQ3RCLEdBQUcsQ0FBQyxJQUFJLEdBQUcsY0FBYyxDQUFDO1lBQzFCLElBQUksQ0FBQyxHQUFHLENBQUMsQ0FBQztZQUNWLE9BQU07U0FDVDtRQUNELEdBQUcsQ0FBQyxJQUFJLENBQUMsSUFBSSxDQUFDLENBQUM7UUFDZixPQUFNO0tBRVQ7SUFBQSxPQUFNLEdBQUcsRUFBRTtRQUNSLElBQUksQ0FBQyxHQUFHLENBQUMsQ0FBQztLQUNiO0FBRUwsQ0FBQyxDQUFBLENBQUE7QUFFRCxPQUFPLENBQUMsVUFBVSxHQUFHLENBQU0sSUFBSSxFQUFFLEdBQUcsRUFBRSxHQUFHLEVBQUUsSUFBSSxFQUFFLEVBQUU7SUFDL0MsTUFBTSxPQUFPLEdBQUcsR0FBRyxDQUFDLE1BQU0sQ0FBQyxFQUFFLENBQUM7SUFDOUIsTUFBTSxFQUFFLElBQUksRUFBRSxVQUFVLEVBQUUsSUFBSSxFQUFFLEdBQUcsSUFBSSxDQUFDO0lBQ3hDLElBQUc7UUFDQywwREFBMEQ7UUFDMUQsSUFBRyxDQUFDLElBQUksRUFBQztZQUVMLGlEQUFpRDtZQUNqRCxJQUFJLGNBQWMsR0FBRyxFQUFFLENBQUE7WUFDdkIsSUFBSSxlQUFlLEdBQUcsTUFBTSxDQUFDLElBQUksQ0FBQyxVQUFVLENBQUMsQ0FBQyxNQUFNLENBQUMsQ0FBQyxLQUFLLEVBQUUsRUFBRSxDQUFDLFVBQVUsQ0FBQyxLQUFLLENBQUMsS0FBSyxTQUFTLENBQUMsQ0FBQTtZQUNoRyxlQUFlLENBQUMsT0FBTyxDQUFDLENBQUMsS0FBSyxFQUFFLEVBQUUsQ0FBQyxjQUFjLENBQUMsS0FBSyxDQUFDLEdBQUcsVUFBVSxDQUFDLEtBQUssQ0FBQyxDQUFDLENBQUM7WUFFOUUsTUFBTSxXQUFXLEdBQUcsTUFBTSxJQUFJLENBQUMsaUJBQWlCLENBQUMsRUFBQyxHQUFHLEVBQUUsT0FBTyxFQUFDLEVBQUUsRUFBQyxJQUFJLEVBQUUsY0FBYyxFQUFDLENBQUMsQ0FBQztZQUN6RixJQUFHLFdBQVcsRUFBQztnQkFDWCxHQUFHLENBQUMsSUFBSSxDQUFDLEVBQUMsT0FBTyxFQUFFLDJCQUEyQixFQUFDLENBQUMsQ0FBQTtnQkFDaEQsT0FBTzthQUNWO1NBQ0o7YUFDRztZQUNBLElBQUksQ0FBQyxJQUFJLENBQUMsQ0FBQztTQUNkO0tBQ0o7SUFBQSxPQUFNLEdBQUcsRUFBQztRQUNQLElBQUksQ0FBQyxHQUFHLENBQUMsQ0FBQztLQUNiO0FBQ0wsQ0FBQyxDQUFBLENBQUE7QUFFRCxPQUFPLENBQUMsVUFBVSxHQUFHLENBQU0sSUFBSSxFQUFFLEdBQUcsRUFBRSxHQUFHLEVBQUUsSUFBSSxFQUFFLEVBQUU7SUFDL0MsTUFBTSxPQUFPLEdBQUcsR0FBRyxDQUFDLE1BQU0sQ0FBQyxFQUFFLENBQUM7SUFFOUIsSUFBRztRQUNDLElBQUcsSUFBSSxDQUFDLElBQUksRUFBQztZQUNULElBQUksQ0FBQyxJQUFJLENBQUMsQ0FBQztZQUNYLE9BQU07U0FDVDtRQUNELE1BQU0sSUFBSSxHQUFHLE1BQU0sSUFBSSxDQUFDLFFBQVEsQ0FBQyxPQUFPLENBQUMsQ0FBQztRQUMxQyxJQUFJLE9BQU8sR0FBRyxNQUFNLElBQUksQ0FBQyxRQUFRLENBQUMsSUFBSSxDQUFDLE9BQU8sQ0FBQyxDQUFDO1FBQ2hELElBQUksYUFBYSxHQUFHLE9BQU8sQ0FBQyxLQUFLLENBQUM7UUFDbEMsYUFBYSxDQUFDLE9BQU8sQ0FBQyxDQUFNLEVBQUUsRUFBRSxLQUFLLEVBQUUsRUFBRSxrREFBQyxPQUFBLEVBQUUsQ0FBQyxNQUFNLENBQUMsSUFBSSxDQUFDLEdBQUcsQ0FBQyxJQUFJLE9BQU8sYUFBYSxDQUFDLEtBQUssQ0FBQyxDQUFBLEdBQUEsQ0FBQyxDQUFBO1FBQzdGLENBQUMsQ0FBQTtRQUNELE9BQU8sQ0FBQyxLQUFLLEdBQUcsYUFBYSxDQUFBO1FBQzdCLE1BQU0sT0FBTyxDQUFDLElBQUksRUFBRSxDQUFDO1FBQ3JCLE1BQU0sSUFBSSxDQUFDLE1BQU0sRUFBRSxDQUFDO1FBRXBCLEdBQUcsQ0FBQyxJQUFJLENBQUMsRUFBQyxPQUFPLEVBQUUsMkJBQTJCLEVBQUMsQ0FBQyxDQUFDO1FBQ2pELE9BQU07S0FDVDtJQUFBLE9BQU0sR0FBRyxFQUFDO1FBQ1AsR0FBRyxDQUFDLElBQUksR0FBQyxXQUFXLENBQUM7UUFDckIsSUFBSSxDQUFDLEdBQUcsQ0FBQyxDQUFDO0tBQ2I7QUFDTCxDQUFDLENBQUEsQ0FBQSJ9
+exports.deleteTask = deleteTask;
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoidGFza3MuY29udHJvbGxlci5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uL3NyYy9jb250cm9sbGVycy90YXNrcy5jb250cm9sbGVyLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7Ozs7OztBQUFBLHVFQUErQztBQUMvQyxxREFBNEM7QUFDNUMscURBQTRDO0FBS3JDLE1BQU0sVUFBVSxHQUFHLENBQU8sSUFBd0IsRUFBRSxHQUFZLEVBQUUsR0FBYSxFQUFFLElBQWtCLEVBQUcsRUFBRTtJQUUzRyxJQUFHO1FBQ0MsMERBQTBEO1FBQzFELElBQUcsTUFBTSxJQUFJLElBQUk7WUFBRSxPQUFPLElBQUksQ0FBQyxJQUFJLENBQUMsQ0FBQztRQUVyQyxJQUFJLEVBQUUsSUFBSSxFQUFFLFVBQVUsRUFBRSxHQUFHLElBQUksQ0FBQztRQUNoQyxJQUFJLE9BQU8sR0FBRyxNQUFNLGlCQUFJLENBQUMsUUFBUSxDQUFDLElBQUksQ0FBQyxHQUFHLENBQUMsQ0FBQztRQUU1QyxJQUFHLENBQUMsT0FBTztZQUFFLE1BQU0sS0FBSyxFQUFFLENBQUM7UUFFM0IsSUFBSSxJQUFJLEdBQUcsTUFBTSxpQkFBSSxDQUFDLE1BQU0saUJBQUUsT0FBTyxFQUFFLE9BQU8sQ0FBQyxHQUFHLElBQUssVUFBVSxFQUFFLENBQUM7UUFFcEUsSUFBRyxDQUFDLElBQUk7WUFBRSxNQUFNLEtBQUssRUFBRSxDQUFDO1FBRXhCLE9BQU8sQ0FBQyxLQUFLLENBQUMsSUFBSSxDQUFDLElBQUksQ0FBQyxHQUFHLENBQUMsQ0FBQztRQUM3QixPQUFPLENBQUMsSUFBSSxFQUFFLENBQUM7UUFDZixHQUFHLENBQUMsTUFBTSxDQUFDLEdBQUcsQ0FBQyxDQUFDLElBQUksQ0FBQyxFQUFDLElBQUksRUFBQyxDQUFDLENBQUM7S0FDaEM7SUFBQSxPQUFNLEdBQVEsRUFBQztRQUNaLEdBQUcsQ0FBQyxJQUFJLEdBQUcsYUFBYSxDQUFBO1FBQ3hCLElBQUksQ0FBQyxH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
