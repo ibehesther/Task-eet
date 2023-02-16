@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { IError } from "../../types/middleware";
+import { IError } from "../../types/error";
 import { IUser } from "../../types/user";
 
 const Joi = require("joi");

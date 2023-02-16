@@ -2,8 +2,9 @@ import APIFeatures from "../utils/apiFeatures";
 import { Task } from "../models/task.model";
 import { User } from "../models/user.model";
 import { NextFunction, Request, Response } from "express";
-import { IError, IUserData } from "../types/middleware";
+import { IUserData } from "../types/middleware";
 import { IUser } from "../types/user";
+import { IError } from "../types/error";
 
 export const createTask = async( data: IUserData | IError, req: Request, res: Response, next: NextFunction ) => {
    

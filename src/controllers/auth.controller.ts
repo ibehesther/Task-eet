@@ -4,9 +4,10 @@ import dotenv from "dotenv";
 dotenv.config();
 import { env } from "process";
 import { IUser } from "../types/user";
-import { IError, IUserData } from "../types/middleware";
+import { IUserData } from "../types/middleware";
 import { NextFunction, Request, Response } from "express";
 import { HydratedDocument } from "mongoose";
+import { IError } from "../types/error";
 
 
 const generateJWT= (data: IUser) => {
@@ -20,11 +21,9 @@ const generateJWT= (data: IUser) => {
 
 export const signupUser = async(data: IUser | IError, req: Request, res: Response, next: NextFunction) => {
     try{
-        if("type" in data){
-            next(data);
-            return;
-            
-        }
+        console.log(data)
+        if("type" in data) return next(data);
+
         const user: HydratedDocument<IUser> = await User.create({...data});
         const token = generateJWT(user);
         res.cookie("access_token", token, {

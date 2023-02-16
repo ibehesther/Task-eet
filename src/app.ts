@@ -8,7 +8,7 @@ import rateLimit from "express-rate-limit";
 import authRouter from "./routes/auth.route";
 import userRouter from "./routes/users.route";
 import taskRouter from "./routes/tasks.route";
-import { errorHandler } from "./middlewares/error.middleware.js";
+import { errorHandler } from "./middlewares/error.middleware";
 import helmet from "helmet";
 
 

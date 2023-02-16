@@ -5,7 +5,7 @@ import { Task } from "../models/task.model";
 import { User }  from "../models/user.model";
 import { NextFunction, Request, Response } from "express";
 import { IPayload, IUser } from "../types/user";
-import { IError } from "../types/middleware";
+import { IError } from "../types/error";
 
 
 const { JWT_SECRET } = process.env

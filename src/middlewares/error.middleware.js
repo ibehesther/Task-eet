@@ -1,5 +1,8 @@
+import { NextFunction, Request, Response } from "express";
+
+
 export function errorHandler(error, req, res, next) {
-  const message = error.e_message || error.details && error.details[0].message
+  const message = error.e_message || error.details && error.details[0] && error.details[0].message
   switch(error.type){
       case "bad request":
         res.status(400).json({

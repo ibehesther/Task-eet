@@ -2,7 +2,8 @@ import { NextFunction, Request, Response } from "express";
 import { Types } from "mongoose";
 import { Task } from "../models/task.model";
 import { User } from "../models/user.model";
-import { IError, IInput, IUserData } from "../types/middleware";
+import { IError } from "../types/error";
+import { IInput, IUserData } from "../types/middleware";
 import { IUser } from "../types/user";
 
 function instanceOfIInput(object: any): object is IInput {

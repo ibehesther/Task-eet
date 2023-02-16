@@ -1,7 +1,7 @@
 import Joi from "joi";
 import { Request, Response, NextFunction } from 'express';
 import { IUser } from "../../types/user";
-import { IError } from "../../types/middleware";
+import { IError } from "../../types/error";
 
 const userSchema = Joi.object({
     first_name: Joi.string()
